@@ -12,13 +12,15 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-
-
 class dagknows_proxy_vault():
     def __init__(self, vault_url, token):
         self.vault_url = vault_url
         self.cl = hvac.Client(self.vault_url, verify=False)
         self.cl.token = token
+
+    def set_jwt_auth_key(self, public_key):
+        result = self.cl.auth.jwt.configure(jwt_validation_pubkeys=public_key)
+        print("Configured jwt validation public key", result, file=sys.stdout)
 
     def list_roles(self):
         try:
