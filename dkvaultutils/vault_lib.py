@@ -19,6 +19,8 @@ class dagknows_proxy_vault():
         self.cl.token = token
 
     def set_jwt_auth_key(self, public_key):
+        """ Replacfes the public_key in our vault.  This is usually the entire contents of a 
+        public key pem file you are using. """
         result = self.cl.auth.jwt.configure(jwt_validation_pubkeys=public_key)
         print("Configured jwt validation public key", result, file=sys.stdout)
 
