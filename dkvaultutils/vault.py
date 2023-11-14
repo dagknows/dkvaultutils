@@ -35,7 +35,7 @@ def get_vault_client():
     return vlt_cl
 
 def vault_init(vault_client, app):
-    public_key = app.config['PUBLIC_KEY']
+    ## public_key = app.config['PUBLIC_KEY']
     try:
         if not vault_client.sys.is_initialized() or not os.path.isfile("src/keys/vault_unseal.keys"):
             print("Vault not initialized yet", file=sys.stdout)
@@ -58,7 +58,7 @@ def vault_init(vault_client, app):
             fh.close()
             print("Saved the vault unseal keys in cmd_exec/src/keys/vault_unseal.keys", file=sys.stdout)
             print("Starting vault config", file=sys.stdout)
-            resp = vault_config(vault_client, public_key)
+            resp = vault_config(vault_client)
             print("Done with vault config", file=sys.stdout)
 
             response = {}
@@ -164,13 +164,16 @@ def vault_delete_user(uname):
         sys.stderr.flush()
 
 
-def vault_config(vault_client, public_key):
+def vault_config(vault_client, public_key=None):
     #Enable JWT authentication
     print("Inside vault config", file=sys.stdout)
     vault_client.sys.enable_auth_method(method_type='jwt')
     print("Enabled jwt authentication", file=sys.stdout)
-    vault_client.auth.jwt.configure(jwt_validation_pubkeys=public_key)
-    print("Configured jwt validation public key", file=sys.stdout)
+
+    if public_key:
+        vault_client.auth.jwt.configure(jwt_validation_pubkeys=public_key)
+        print("Configured jwt validation public key", file=sys.stdout)
+
     try:
         vault_add_role(vault_client, 'allusers', rolecheck=False)
     except Exception as e:
